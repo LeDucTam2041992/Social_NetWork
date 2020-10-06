@@ -10,6 +10,7 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     PostRepository postRepository;
+
     @Override
     public Iterable<Post> findAll() {
         return postRepository.findAll();
@@ -32,7 +33,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Iterable<Post> findAllPostByAuthor(User user, StatusPost statusPost) {
-        return postRepository.findAllByUserAndStatusPost(user,statusPost);
+        return postRepository.findAllByUserAndStatusPost(user, statusPost);
     }
 
     @Override

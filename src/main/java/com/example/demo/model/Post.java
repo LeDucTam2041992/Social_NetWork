@@ -143,4 +143,12 @@ public class Post {
         }
         return str;
     }
+
+    public long getStatusLikeOfUser(long userId){
+        for (Like l:likes) {
+            if(l.getId().getUser_id() == userId && l.getStatusLike().getId()==1) return 1;
+            if(l.getId().getUser_id() == userId && l.getStatusLike().getId()==2) return 2;
+        }
+        return 0;
+    }
 }

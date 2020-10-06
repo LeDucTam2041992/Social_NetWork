@@ -10,33 +10,53 @@
     <div class="row">
         <div class="col-10">
             <div th:each="p:${posts}">
+                <a th:href="@{/users/views-home-user/__${p.user.id}__}">
+                    <img th:src="@{/i/__${p.user.avatar.name}__}" class="rounded-circle m mr-2" width="50px">
+                    <label th:text="${p.user.name}"></label>
+                </a>
                 <div>
-                    <a th:href="@{/users/views-home-user/__${p.user.id}__}">
-                        <img th:src="@{/i/__${p.user.avatar.name}__}" class="rounded-circle m mr-2" width="50px">
-                        <label th:text="${p.user.name}"></label>
-                    </a>
+                    <label>Time published : </label>
+                    <label th:text="${p.datePublished}"></label>
                     <br>
-                    <label>Time published : </label><label th:text="${p.datePublished}"></label>
-                    <br>
-                    <label th:text="${p.title}"></label>
-                    <br>
-                    <div th:if="${p.image.name!=''}">
-                        <img th:src="@{/i/__${p.image.name}__}" width="250px">
+                    <label class="display-4" th:text="${p.title}"></label>
+                </div>
+                <div th:if="${p.image.name!=''}">
+                    <img th:src="@{/i/__${p.image.name}__}" width="250px">
+                </div>
+                <br>
+                <p th:text="${p.getIntroduce()}"></p>
+                <a th:href="@{#content__${p.id}__}" aria-expanded="false" data-toggle="collapse">Show</a>
+                <div class="collapse mt-2" th:id="'content'+__${p.id}__">
+                    <p th:text="${p.content}"></p>
+                </div>
+                <div th:switch="${p.getStatusLikeOfUser(__${userId}__)}">
+                    <div th:case="0">
+                        <label th:text="${p.getNumOfLike()}"></label>
+                        <a th:href="@{users/like-post/__${p.id}__}">
+                            <label th:id="'like'+__${p.id}__" class="text-secondary mr-2">Like</label>
+                        </a>
+                        <label th:text="${p.getNumOfDisLike()}"></label>
+                        <label th:id="'dislike'+__${p.id}__" class="text-secondary mr-2">DisLike</label>
+                        <label th:text="${p.comments.size()}"></label>
+                        <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
                     </div>
-                    <br>
-                    <p th:text="${p.getIntroduce()}"></p>
-
-                    <a th:href="@{#content__${p.id}__}" aria-expanded="false" data-toggle="collapse">Show</a>
-                    <div class="collapse mt-2" th:id="'content'+__${p.id}__">
-                        <p th:text="${p.content}"></p>
+                    <div th:case="1">
+                        <label th:text="${p.getNumOfLike()}"></label>
+                        <label th:id="'like'+__${p.id}__" class="text-primary mr-2">Like</label>
+                        <label th:text="${p.getNumOfDisLike()}"></label>
+                        <label th:id="'dislike'+__${p.id}__" class="text-secondary mr-2">DisLike</label>
+                        <label th:text="${p.comments.size()}"></label>
+                        <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
                     </div>
-                    <br>
-                    <label th:text="${p.getNumOfLike()}"></label><label> Like</label>
-                    <br>
-                    <label th:text="${p.getNumOfDisLike()}"></label><label> DisLike</label>
-                    <br>
-                    <label th:text="${p.comments.size()}"></label>
-                    <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label> Comments</label></a>
+                    <div th:case="2">
+                        <label th:text="${p.getNumOfLike()}"></label>
+                        <label th:id="'like'+__${p.id}__" class="text-secondary mr-2">Like</label>
+                        <label th:text="${p.getNumOfDisLike()}"></label>
+                        <label th:id="'dislike'+__${p.id}__" class="text-primary mr-2">DisLike</label>
+                        <label th:text="${p.comments.size()}"></label>
+                        <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
+                    </div>
+                </div>
                     <div class="collapse mt-2" th:id="'comment'+__${p.id}__">
                         <div th:each="c:${p.comments}">
                             <div>
@@ -46,6 +66,14 @@
                                 <p th:text="${c.comment}"></p>
                             </div>
                         </div>
+                        <div>
+                            <p>Comment Here</p>
+                            <form>
+                                <textarea cols="100" rows="4" name="comment"></textarea>
+                                <br>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                        </div>
                     </div>
                     <div th:if="${userId}==${p.user.id}">
                         <a th:href="@{/users/post/__${p.id}__/delete}">
@@ -53,7 +81,6 @@
                         </a>
                     </div>
                     <hr>
-                </div>
             </div>
         </div>
         <div class="col-2">

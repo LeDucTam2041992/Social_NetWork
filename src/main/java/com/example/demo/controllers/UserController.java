@@ -153,7 +153,8 @@ public class UserController {
     @GetMapping("/post/{id}/delete")
     public String deletePost(@PathVariable("id") long id) {
         Post post = postService.findById(id);
-        postService.remove(id);
+        post.setStatusPost(new StatusPost(0, "Block"));
+        postService.save(post);
         return "redirect:/users/views-post";
     }
 }
