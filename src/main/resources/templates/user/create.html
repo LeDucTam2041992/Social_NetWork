@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/layout::head">
+</head>
+<body>
+<section class="container">
+    <h2>Create New Account</h2>
+    <form method="post" th:object="${user}">
+        <table class="table">
+            <tr>
+                <td>Name : </td>
+                <td><input type="text" th:field="*{name}"></td>
+            </tr>
+            <tr>
+                <td>Address : </td>
+                <td><input type="text" th:field="*{address}"></td>
+            </tr>
+            <tr>
+                <td>Email : </td>
+                <td><input type="text" th:field="*{email}"></td>
+            </tr>
+            <tr>
+                <td>Phone Number : </td>
+                <td><input type="text" th:field="*{phoneNumber}"></td>
+            </tr>
+            <tr>
+                <td>Password : </td>
+                <td><input type="password" th:field="*{password}"></td>
+            </tr>
+            <tr>
+                <td>Gender : </td>
+                <td><input type="text" th:field="*{gender}"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button type="submit" class="btn btn-primary">Submit</button></td>
+            </tr>
+        </table>
+    </form>
+</section>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/layout::head">
+</head>
+<body>
+<section class="container">
+    <h2>Create New Post</h2>
+    <form method="post" th:object="${post}" th:action="@{/users/create}"  enctype="multipart/form-data">
+       <table class="table">
+           <tr>
+               <td>Title :</td>
+               <td><input type="text" th:field="*{title}"></td>
+           </tr>
+           <tr>
+               <td>Content :</td>
+               <td><textarea cols="120" rows="20" th:field="*{content}"></textarea></td>
+           </tr>
+           <tr>
+               <td>Images :</td>
+               <td><input type="file" th:field="*{image.file}"></td>
+           </tr>
+           <tr>
+               <td></td>
+               <td><button type="submit">Submit</button></td>
+           </tr>
+       </table>
+    </form>
+</section>
+</body>
+</html>

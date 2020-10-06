@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/layout::head">
+
+</head>
+<body>
+<section class="container">
+    <h2 class="text-center">List Post Test</h2>
+    <hr>
+    <div class="row">
+        <div class="col-10">
+            <div th:each="p:${posts}">
+                <div>
+                    <a th:href="@{/users/views-home-user/__${p.user.id}__}">
+                        <img th:src="@{/i/__${p.user.avatar.name}__}" class="rounded-circle m mr-2" width="50px">
+                        <label th:text="${p.user.name}"></label>
+                    </a>
+                    <br>
+                    <label>Time published : </label><label th:text="${p.datePublished}"></label>
+                    <br>
+                    <label th:text="${p.title}"></label>
+                    <br>
+                    <div th:if="${p.image.name!=''}">
+                        <img th:src="@{/i/__${p.image.name}__}" width="250px">
+                    </div>
+                    <br>
+                    <p th:text="${p.getIntroduce()}"></p>
+
+                    <a th:href="@{#content__${p.id}__}" aria-expanded="false" data-toggle="collapse">Show</a>
+                    <div class="collapse mt-2" th:id="'content'+__${p.id}__">
+                        <p th:text="${p.content}"></p>
+                    </div>
+                    <br>
+                    <label th:text="${p.getNumOfLike()}"></label><label> Like</label>
+                    <br>
+                    <label th:text="${p.getNumOfDisLike()}"></label><label> DisLike</label>
+                    <br>
+                    <label th:text="${p.comments.size()}"></label>
+                    <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label> Comments</label></a>
+                    <div class="collapse mt-2" th:id="'comment'+__${p.id}__">
+                        <div th:each="c:${p.comments}">
+                            <div>
+                                <img th:src="@{/i/__${c.user.avatar.name}__}" width="30px" class="rounded-circle">
+                                <label th:text="${c.user.name}"></label>
+                                <br>
+                                <p th:text="${c.comment}"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${userId}==${p.user.id}">
+                        <a th:href="@{/users/post/__${p.id}__/delete}">
+                            Delete Post
+                        </a>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <h3>List Friends</h3>
+            <hr>
+            <div th:each="f:${friends}" class="m m-4">
+                <a href="#">
+                    <img th:src="@{/i/__${f.avatar.name}__}" width="50px" class="rounded-circle">
+                    <label th:text="${f.name}"></label>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
