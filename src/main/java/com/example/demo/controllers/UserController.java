@@ -9,6 +9,7 @@ import com.example.demo.service.relationship.RelationshipService;
 import com.example.demo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -67,6 +68,15 @@ public class UserController {
             }
         }
         return friends;
+    }
+
+    private void setLikeForPost(Post post) {
+        Iterable<Like> likes = likeService.findAllByPost(post);
+        Set<Like> lks = new LinkedHashSet<>();
+        for (Like l:likes) {
+            lks.add(l);
+        }
+        post.setLikes(lks);
     }
 
     @GetMapping("/home")
@@ -138,12 +148,7 @@ public class UserController {
             }
             p.setComments(cms);
 
-            Iterable<Like> likes = likeService.findAllByPost(p);
-            Set<Like> lks = new LinkedHashSet<>();
-            for (Like l:likes) {
-                lks.add(l);
-            }
-            p.setLikes(lks);
+            setLikeForPost(p);
         }
         model.addAttribute("posts", postList);
         model.addAttribute("userId",user.getId());
@@ -156,5 +161,49 @@ public class UserController {
         post.setStatusPost(new StatusPost(0, "Block"));
         postService.save(post);
         return "redirect:/users/views-post";
+    }
+
+    @GetMapping(value = "/like-post/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public int likeStatus(@PathVariable long id) {
+        Post post = postService.findById(id);
+        setLikeForPost(post);
+        User user = getUser();
+        long statusLikeOfUser = post.getStatusLikeOfUser(user.getId());
+        if(statusLikeOfUser==0||statusLikeOfUser==2){
+            Like like = new Like();
+            like.setId(new CompositeLikePK(user.getId(), post.getId()));
+            like.setStatusLike(new StatusLike(1,"like"));
+            likeService.save(like);
+            return 1;
+        }else {
+            Like like = new Like();
+            like.setId(new CompositeLikePK(user.getId(), post.getId()));
+            like.setStatusLike(new StatusLike(0,"none"));
+            likeService.save(like);
+            return 0;
+        }
+    }
+
+    @GetMapping(value = "/dislike-post/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public int dislikeStatus(@PathVariable long id) {
+        Post post = postService.findById(id);
+        setLikeForPost(post);
+        User user = getUser();
+        long statusLikeOfUser = post.getStatusLikeOfUser(user.getId());
+        if(statusLikeOfUser==0||statusLikeOfUser==1){
+            Like like = new Like();
+            like.setId(new CompositeLikePK(user.getId(), post.getId()));
+            like.setStatusLike(new StatusLike(2,"dislike"));
+            likeService.save(like);
+            return 2;
+        }else {
+            Like like = new Like();
+            like.setId(new CompositeLikePK(user.getId(), post.getId()));
+            like.setStatusLike(new StatusLike(0,"none"));
+            likeService.save(like);
+            return 0;
+        }
     }
 }

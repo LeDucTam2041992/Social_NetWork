@@ -14,6 +14,11 @@ public class CompositeLikePK implements Serializable {
     public CompositeLikePK() {
     }
 
+    public CompositeLikePK(long user_id, long post_id) {
+        this.user_id = user_id;
+        this.post_id = post_id;
+    }
+
     public long getUser_id() {
         return user_id;
     }

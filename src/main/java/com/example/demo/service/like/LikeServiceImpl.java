@@ -14,6 +14,11 @@ public class LikeServiceImpl implements LikeService{
     }
 
     @Override
+    public void updateLike(int status_id, long post_id, long user_id) {
+        likeRepository.updateLike(status_id,post_id,user_id);
+    }
+
+    @Override
     public Iterable<Like> findAll() {
         return likeRepository.findAll();
     }

@@ -32,27 +32,37 @@
                 <div th:switch="${p.getStatusLikeOfUser(__${userId}__)}">
                     <div th:case="0">
                         <label th:text="${p.getNumOfLike()}"></label>
-                        <a th:href="@{users/like-post/__${p.id}__}">
-                            <label th:id="'like'+__${p.id}__" class="text-secondary mr-2">Like</label>
+                        <a th:id="'like'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/like-post/__${p.id}__}">
+                            Like
                         </a>
                         <label th:text="${p.getNumOfDisLike()}"></label>
-                        <label th:id="'dislike'+__${p.id}__" class="text-secondary mr-2">DisLike</label>
+                        <a th:id="'dislike'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/dislike-post/__${p.id}__}">
+                            Dislike
+                        </a>
                         <label th:text="${p.comments.size()}"></label>
                         <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
                     </div>
                     <div th:case="1">
                         <label th:text="${p.getNumOfLike()}"></label>
-                        <label th:id="'like'+__${p.id}__" class="text-primary mr-2">Like</label>
+                        <a th:id="'like'+__${p.id}__" class="text-primary mr-2" th:href="@{/users/like-post/__${p.id}__}">
+                            Like
+                        </a>
                         <label th:text="${p.getNumOfDisLike()}"></label>
-                        <label th:id="'dislike'+__${p.id}__" class="text-secondary mr-2">DisLike</label>
+                        <a th:id="'dislike'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/dislike-post/__${p.id}__}">
+                            Dislike
+                        </a>
                         <label th:text="${p.comments.size()}"></label>
                         <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
                     </div>
                     <div th:case="2">
                         <label th:text="${p.getNumOfLike()}"></label>
-                        <label th:id="'like'+__${p.id}__" class="text-secondary mr-2">Like</label>
+                        <a th:id="'like'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/like-post/__${p.id}__}">
+                            Like
+                        </a>
                         <label th:text="${p.getNumOfDisLike()}"></label>
-                        <label th:id="'dislike'+__${p.id}__" class="text-primary mr-2">DisLike</label>
+                        <a th:id="'dislike'+__${p.id}__" class="text-primary mr-2" th:href="@{/users/dislike-post/__${p.id}__}">
+                            Dislike
+                        </a>
                         <label th:text="${p.comments.size()}"></label>
                         <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
                     </div>
@@ -95,5 +105,7 @@
         </div>
     </div>
 </section>
+<script th:src="@{/i/likeAjax.js}"></script>
+<script th:src="@{/i/dislikeAjax.js}"></script>
 </body>
 </html>

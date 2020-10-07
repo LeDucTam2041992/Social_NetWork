@@ -14,6 +14,11 @@ public class StatusLike {
     public StatusLike() {
     }
 
+    public StatusLike(int id, String status) {
+        this.id = id;
+        this.status = status;
+    }
+
     public int getId() {
         return id;
     }

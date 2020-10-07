@@ -1,10 +1,10 @@
 $(document).ready(function () {
-    var likeLink = $("a:contains('Like')");
-    $(likeLink).click(function (event) {
-        var idLike = $(event.target).attr("id");
-        var idDislike = "dis" + idLike;
-        console.log(idLike);
+    var dislikeLink = $("a:contains('Dislike')");
+    $(dislikeLink).click(function (event) {
+        var idDislike = $(event.target).attr("id");
+        var idLike = idDislike.slice(3);
         console.log(idDislike);
+        console.log(idLike);
         var like = document.getElementById(idLike);
         var disLike = document.getElementById(idDislike);
         $.ajax({
@@ -15,9 +15,9 @@ $(document).ready(function () {
                 'Content-Type': 'application/json'
             },
             success: function (likeStatus) {
-                if(likeStatus==1) {
-                    like.className = 'text-primary mr-2';
-                    disLike.className = 'text-secondary mr-2';
+                if(likeStatus==2) {
+                    like.className = 'text-secondary mr-2';
+                    disLike.className = 'text-primary mr-2';
                 } else {
                     like.className = 'text-secondary mr-2';
                     disLike.className = 'text-secondary mr-2';
