@@ -45,10 +45,8 @@
     <div class="row">
         <div class="col-10">
             <div th:each="p:${posts}">
-                <a th:href="@{/users/views-home-user/__${p.user.id}__}">
-                    <img th:src="@{/i/__${p.user.avatar.name}__}" class="rounded-circle m mr-2" width="50px">
-                    <label th:text="${p.user.name}"></label>
-                </a>
+                <img th:src="@{/i/__${p.user.avatar.name}__}" class="rounded-circle m mr-2" width="50px">
+                <label th:text="${p.user.name}"></label>
                 <div>
                     <label>Time published : </label>
                     <label th:text="${p.datePublished}"></label>

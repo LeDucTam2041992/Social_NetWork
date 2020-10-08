@@ -188,8 +188,9 @@ public class UserController {
     @GetMapping("/views-post")
     public String viewPost(Model model) {
         User user = getUser();
-        Set<User> friends = getFriendsOnline(user);
-        model.addAttribute("friends", friends);
+        Set<User> friendsOnline = getFriendsOnline(user);
+        Set<User> friends = getFriends(user);
+        model.addAttribute("friends", friendsOnline);
         List<Post> postList = new LinkedList<>();
         Iterable<Post> postOfPriority = postService.findAllPostByStatus(new StatusPost(2,"OnTop"));
         for (Post p:postOfPriority) {
@@ -310,5 +311,28 @@ public class UserController {
         model.addAttribute("user",user);
         model.addAttribute("friends", getFriends(user));
         return "user/friends_list";
+    }
+
+    @GetMapping("/go-home-user/{id}")
+    public String goHomeUser(@PathVariable("id") long id, Model model) {
+        User user = getUser();
+        Set<User> friendsOfUser = getFriends(user);
+        User userA = userService.findById(id);
+        Set<User> friendsOfUserA = getFriends(userA);
+        Iterable<Image> imagesOfUserA = imageService.findAllByUser(userA);
+        boolean relationship;
+        Iterable<Post> postOfUserA = postService.findAllPostByAuthor(userA, new StatusPost(1, "Accepted"));
+        if(friendsOfUser.contains(userA)){
+            relationship = true;
+        } else {
+            relationship = false;
+        }
+        model.addAttribute("userA", userA);
+        model.addAttribute("pOA", postOfUserA);
+        model.addAttribute("fOA", friendsOfUserA);
+        model.addAttribute("iOA", imagesOfUserA);
+        model.addAttribute("relation", relationship);
+        model.addAttribute("user", user);
+        return "user/guest";
     }
 }

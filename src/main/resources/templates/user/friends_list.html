@@ -14,8 +14,10 @@
     <div th:replace="/user/home::header">
     </div>
     <div th:each="f:${friends}">
-        <img class="rounded-circle py-3" th:src="@{/i/__${f.avatar.name}__}" width="50px" alt="No image">
-        <label th:text="${f.name}"></label>
+        <a th:href="@{/users/go-home-user/__${f.id}__}">
+            <img class="rounded-circle py-3" th:src="@{/i/__${f.avatar.name}__}" width="50px" alt="No image">
+            <label th:text="${f.name}"></label>
+        </a>
     </div>
 </section>
 <footer>

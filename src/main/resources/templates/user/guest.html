@@ -1,56 +1,54 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/layout::head">
-
 </head>
 <body>
 <section class="container">
     <div>
+        <img th:src="@{/i/__${userA.avatar.name}__}" width="100%" height="300px" class="m-auto">
+    </div>
+    <div>
+        <p class="text-center display-3" th:text="${userA.name}">
+        </p>
+    </div>
+    <div>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Navbar</a>
+            <a class="navbar-brand" href="/users/views-post">COME ON</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="/users/home">Home <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="#">Do something<span class="sr-only">(current)</span></a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Do something<span class="sr-only">(current)</span></a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Dropdown
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Disabled</a>
-                    </li>
+                    <div th:if="!${relation}">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Add Friends<span class="sr-only">(current)</span></a>
+                        </li>
+                    </div>
                 </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
             </div>
         </nav>
     </div>
-</section>
-<section class="container">
     <div class="row">
-        <div class="col-10">
-            <div th:each="p:${posts}">
-                <a th:href="@{/users/go-home-user/__${p.user.id}__}">
-                    <img th:src="@{/i/__${p.user.avatar.name}__}" class="rounded-circle m mr-2" width="50px">
-                    <label th:text="${p.user.name}"></label>
+        <div class="col-2">
+            Friends Of <label th:text="${userA.name}"></label>
+            <div th:each="f:${fOA}" class="m m-4">
+                <a href="#">
+                    <img th:src="@{/i/__${f.avatar.name}__}" width="50px" class="rounded-circle">
+                    <label th:text="${f.name}"></label>
                 </a>
+            </div>
+        </div>
+
+        <div class="col-10">
+            <div th:each="p:${pOA}">
+                <img th:src="@{/i/__${p.user.avatar.name}__}" class="rounded-circle m mr-2" width="50px">
+                <label th:text="${p.user.name}"></label>
                 <div>
                     <label>Time published : </label>
                     <label th:text="${p.datePublished}"></label>
@@ -66,7 +64,7 @@
                 <div class="collapse mt-2" th:id="'content'+__${p.id}__">
                     <p th:text="${p.content}"></p>
                 </div>
-                <div th:switch="${p.getStatusLikeOfUser(__${userId}__)}">
+                <div th:switch="${p.getStatusLikeOfUser(__${user.id}__)}">
                     <div th:case="0">
                         <label th:text="${p.getNumOfLike()}"></label>
                         <a th:id="'like'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/like-post/__${p.id}__}">
@@ -124,22 +122,18 @@
                 </div>
             </div>
         </div>
-        <div class="col-2">
-            <h3>Friend Online</h3>
-            <hr>
-            <div th:each="f:${friends}" class="m m-4">
-                <a href="#">
-                    <img th:src="@{/i/__${f.avatar.name}__}" width="50px" class="rounded-circle">
-                    <label th:text="${f.name}"></label>
-                </a>
+    </div>
+    <div>
+        Images Of <label th:text="${userA.name}"></label>
+        <div class="row m-auto" style="width: 100%">
+            <div class="col-lg-3 col-xl-2 border" th:each="i:${iOA}">
+                <img class="img-fluid py-3" th:src="@{/i/__${i.name}__}" alt="No image">
             </div>
         </div>
     </div>
 </section>
 <section class="container">
-    <div th:replace="/layout::footer">
-
-    </div>
+    <div th:replace="/layout::footer"></div>
 </section>
 <script th:src="@{/i/likeAjax.js}"></script>
 <script th:src="@{/i/dislikeAjax.js}"></script>
