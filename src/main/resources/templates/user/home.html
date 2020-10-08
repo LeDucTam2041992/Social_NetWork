@@ -26,6 +26,9 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="/users/views-images">Images Of You<span class="sr-only">(current)</span></a>
                     </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/users/views-friends">Friends<span class="sr-only">(current)</span></a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/logout}">Logout</a>
                     </li>
@@ -126,7 +129,7 @@
             </div>
         </div>
         <div class="col-2">
-            <h4>List Friends</h4>
+            <h4>Friend Online</h4>
             <div th:each="f:${friends}" class="m m-4">
                 <a href="#">
                     <img th:src="@{/i/__${f.avatar.name}__}" width="50px" class="rounded-circle">

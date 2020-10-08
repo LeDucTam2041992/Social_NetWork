@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.*;
 
 @Controller
-@SessionAttributes("user")
 @RequestMapping("/users")
 public class UserController {
     @Value("${upload.file}")
@@ -52,13 +51,11 @@ public class UserController {
         }
         return userName;
     }
-
-    @ModelAttribute("user")
     public User getUser() {
         return userService.findUserByEmail(getPrincipal());
     }
 
-    private Set<User> getFriends(@ModelAttribute("user") User user){
+    private Set<User> getFriends(User user){
         Iterable<Relationship> friendsRe = relationshipService.findAllFriendOfUser(user);
         Set<User> friends = new LinkedHashSet<>();
         for (Relationship r:friendsRe) {
@@ -69,6 +66,15 @@ public class UserController {
             }
         }
         return friends;
+    }
+
+    private Set<User> getFriendsOnline(User user) {
+        Set<User> friends = getFriends(user);
+        Set<User> fiendsOnline = new LinkedHashSet<>();
+        for (User u:friends) {
+            if(u.getStatusUser().getStatus().equals("online")) fiendsOnline.add(u);
+        }
+        return fiendsOnline;
     }
 
     private void setLikeForPost(Post post) {
@@ -117,9 +123,10 @@ public class UserController {
     }
 
     @GetMapping("/home")
-    public String goHome(Model model, @ModelAttribute("user") User user){
-        user.setStatusUser(new StatusUser(1,"online"));
-        userService.save(user);
+    public String goHome(Model model){
+        User user = getUser();
+        System.out.println(user.getId());
+        System.out.println(user.getStatusUser().getStatus());
         List<Post> postList = new LinkedList<>();
         Iterable<Post> postOfUser = postService.findAllPostByAuthor(user, new StatusPost(1,"Accepted"));
         for (Post p:postOfUser) {
@@ -129,7 +136,7 @@ public class UserController {
             setCommentForPost(p);
             setLikeForPost(p);
         }
-        Set<User> friends = getFriends(user);
+        Set<User> friends = getFriendsOnline(user);
         model.addAttribute("friends", friends);
         model.addAttribute("posts", postList);
         model.addAttribute("user",user);
@@ -144,7 +151,8 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public String saveNewPost(@ModelAttribute("post") Post post, @ModelAttribute("user") User user) {
+    public String saveNewPost(@ModelAttribute("post") Post post) {
+        User user = getUser();
         Image image = post.getImage();
         MultipartFile file = image.getFile();
         if(!file.isEmpty()) {
@@ -178,8 +186,9 @@ public class UserController {
     }
 
     @GetMapping("/views-post")
-    public String viewPost(Model model, @ModelAttribute("user") User user) {
-        Set<User> friends = getFriends(user);
+    public String viewPost(Model model) {
+        User user = getUser();
+        Set<User> friends = getFriendsOnline(user);
         model.addAttribute("friends", friends);
         List<Post> postList = new LinkedList<>();
         Iterable<Post> postOfPriority = postService.findAllPostByStatus(new StatusPost(2,"OnTop"));
@@ -205,13 +214,15 @@ public class UserController {
             setLikeForPost(p);
         }
         model.addAttribute("posts", postList);
+        model.addAttribute("user", user);
         model.addAttribute("userId",user.getId());
         return "user/viewPost";
     }
 
     @GetMapping("/post/{id}/delete")
-    public String deletePost(@PathVariable("id") long id, @ModelAttribute("user") User user) {
+    public String deletePost(@PathVariable("id") long id) {
         Post post = postService.findById(id);
+        User user = getUser();
         if(post.getUser().getId() == user.getId()) {
             post.setStatusPost(new StatusPost(0, "Block"));
             postService.save(post);
@@ -221,8 +232,9 @@ public class UserController {
 
     @GetMapping(value = "/like-post/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public int likeStatus(@PathVariable long id, @ModelAttribute("user") User user) {
+    public int likeStatus(@PathVariable long id) {
         Post post = postService.findById(id);
+        User user = getUser();
         setLikeForPost(post);
         long statusLikeOfUser = post.getStatusLikeOfUser(user.getId());
         if(statusLikeOfUser==0||statusLikeOfUser==2){
@@ -242,8 +254,9 @@ public class UserController {
 
     @GetMapping(value = "/dislike-post/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public int dislikeStatus(@PathVariable long id,@ModelAttribute("user") User user) {
+    public int dislikeStatus(@PathVariable long id) {
         Post post = postService.findById(id);
+        User user = getUser();
         setLikeForPost(post);
         long statusLikeOfUser = post.getStatusLikeOfUser(user.getId());
         if(statusLikeOfUser==0||statusLikeOfUser==1){
@@ -262,27 +275,40 @@ public class UserController {
     }
 
     @PostMapping(value = "/comment-post/{id}")
-    public String comment(@PathVariable long id, @ModelAttribute("comment") String cms, @ModelAttribute("user") User user) {
+    public String comment(@PathVariable long id, @ModelAttribute("comment") String cms) {
         Post post = postService.findById(id);
+        User user = getUser();
         Comment comment = new Comment();
         comment.setComment(cms);
         comment.setPost(post);
+        System.out.println(user.getId());
         comment.setUser(user);
         commentService.save(comment);
         return "redirect:/users/views-post";
     }
 
     @GetMapping("/views-images")
-    public String showImages(Model model,@ModelAttribute("user") User user) {
+    public String showImages(Model model) {
+        User user = getUser();
         Iterable<Image> images = imageService.findAllByUser(user);
+        model.addAttribute("user", user);
         model.addAttribute("imageList", images);
         model.addAttribute("image", new Image());
         return "user/images_list";
     }
 
     @PostMapping("/create-image")
-    public String createImg(@ModelAttribute("image") Image image,@ModelAttribute("user") User user) {
+    public String createImg(@ModelAttribute("image") Image image) {
+        User user = getUser();
         saveImage(image,user);
         return "redirect:/users/views-images";
+    }
+
+    @GetMapping("/views-friends")
+    public String listFriends(Model model){
+        User user = getUser();
+        model.addAttribute("user",user);
+        model.addAttribute("friends", getFriends(user));
+        return "user/friends_list";
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.sercurity;
 
+import com.example.demo.model.StatusUser;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Email " + username + " not found"));
+        user.setStatusUser(new StatusUser(1,"online"));
+        userRepository.save(user);
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 getAuthorities(user));
     }
