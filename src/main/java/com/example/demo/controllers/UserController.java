@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Controller
+@SessionAttributes("user")
 @RequestMapping("/users")
 public class UserController {
     @Value("${upload.file}")
@@ -52,12 +53,12 @@ public class UserController {
         return userName;
     }
 
-    private User getUser() {
+    @ModelAttribute("user")
+    public User getUser() {
         return userService.findUserByEmail(getPrincipal());
     }
 
-    private Set<User> getFriends(){
-        User user = getUser();
+    private Set<User> getFriends(@ModelAttribute("user") User user){
         Iterable<Relationship> friendsRe = relationshipService.findAllFriendOfUser(user);
         Set<User> friends = new LinkedHashSet<>();
         for (Relationship r:friendsRe) {
@@ -79,8 +80,59 @@ public class UserController {
         post.setLikes(lks);
     }
 
+    private void setCommentForPost(Post post) {
+        Iterable<Comment> comments = commentService.findAllByPost(post);
+        Set<Comment> cms = new LinkedHashSet<>();
+        for (Comment c:comments) {
+            cms.add(c);
+        }
+        post.setComments(cms);
+    }
+
+    private void saveImage(Image image, User user){
+        MultipartFile file = image.getFile();
+        String img = null;
+        if (!file.isEmpty()) {
+            boolean check = true;
+            String imgName = file.getOriginalFilename();
+            while (check) {
+                Random rd = new Random();
+                img = rd.nextInt(100000) + imgName.substring(imgName.length()-4);
+                image.setName(img);
+                image.setUser(user);
+                try {
+                    imageService.save(image);
+                    check=false;
+                }catch (Exception e){
+                    e.printStackTrace();
+                    check=true;
+                }
+            }
+            try {
+                FileCopyUtils.copy(file.getBytes(), new File(pathFile + img));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @GetMapping("/home")
-    public String goHome(){
+    public String goHome(Model model, @ModelAttribute("user") User user){
+        user.setStatusUser(new StatusUser(1,"online"));
+        userService.save(user);
+        List<Post> postList = new LinkedList<>();
+        Iterable<Post> postOfUser = postService.findAllPostByAuthor(user, new StatusPost(1,"Accepted"));
+        for (Post p:postOfUser) {
+            postList.add(p);
+        }
+        for (Post p:postList) {
+            setCommentForPost(p);
+            setLikeForPost(p);
+        }
+        Set<User> friends = getFriends(user);
+        model.addAttribute("friends", friends);
+        model.addAttribute("posts", postList);
+        model.addAttribute("user",user);
         return "user/home";
     }
 
@@ -92,20 +144,33 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public String saveNewPost(@ModelAttribute("post") Post post) {
+    public String saveNewPost(@ModelAttribute("post") Post post, @ModelAttribute("user") User user) {
         Image image = post.getImage();
-        if(image!=null) {
-            MultipartFile file = image.getFile();
-            String img = file.getOriginalFilename();
-            image.setName(img);
-            imageService.save(image);
+        MultipartFile file = image.getFile();
+        if(!file.isEmpty()) {
+            boolean check = true;
+            String img = null;
+            String imgName = file.getOriginalFilename();
+            while (check) {
+                Random rd = new Random();
+                img = rd.nextInt(100000) + imgName.substring(imgName.length()-4);
+                image.setName(img);
+                try {
+                    imageService.save(image);
+                    check=false;
+                }catch (Exception e){
+                    e.printStackTrace();
+                    check=true;
+                }
+            }
             try {
                 FileCopyUtils.copy(file.getBytes(), new File(pathFile + img));
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            imageService.save(image);
         }
-        User user = getUser();
         post.setUser(user);
         post.setStatusPost(new StatusPost(1,"Accepted"));
         postService.save(post);
@@ -113,24 +178,20 @@ public class UserController {
     }
 
     @GetMapping("/views-post")
-    public String viewPost(Model model) {
-        Set<User> friends = getFriends();
-        User user = getUser();
+    public String viewPost(Model model, @ModelAttribute("user") User user) {
+        Set<User> friends = getFriends(user);
         model.addAttribute("friends", friends);
         List<Post> postList = new LinkedList<>();
-
         Iterable<Post> postOfPriority = postService.findAllPostByStatus(new StatusPost(2,"OnTop"));
         for (Post p:postOfPriority) {
             postList.add(p);
         }
-
         Iterable<Post> postOfUser = postService.findAllPostByAuthor(user, new StatusPost(1, "Accepted"));
         for (Post p:postOfUser) {
             if(!postList.contains(p)) {
                 postList.add(p);
             }
         }
-
         for (User u:friends) {
             Iterable<Post> postOfFriends = postService.findAllPostByAuthor(u, new StatusPost(1, "Accepted"));
             for (Post p:postOfFriends) {
@@ -139,15 +200,8 @@ public class UserController {
                 }
             }
         }
-
         for (Post p: postList) {
-            Iterable<Comment> comments = commentService.findAllByPost(p);
-            Set<Comment> cms = new LinkedHashSet<>();
-            for (Comment c:comments) {
-                cms.add(c);
-            }
-            p.setComments(cms);
-
+            setCommentForPost(p);
             setLikeForPost(p);
         }
         model.addAttribute("posts", postList);
@@ -156,19 +210,20 @@ public class UserController {
     }
 
     @GetMapping("/post/{id}/delete")
-    public String deletePost(@PathVariable("id") long id) {
+    public String deletePost(@PathVariable("id") long id, @ModelAttribute("user") User user) {
         Post post = postService.findById(id);
-        post.setStatusPost(new StatusPost(0, "Block"));
-        postService.save(post);
+        if(post.getUser().getId() == user.getId()) {
+            post.setStatusPost(new StatusPost(0, "Block"));
+            postService.save(post);
+        }
         return "redirect:/users/views-post";
     }
 
     @GetMapping(value = "/like-post/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public int likeStatus(@PathVariable long id) {
+    public int likeStatus(@PathVariable long id, @ModelAttribute("user") User user) {
         Post post = postService.findById(id);
         setLikeForPost(post);
-        User user = getUser();
         long statusLikeOfUser = post.getStatusLikeOfUser(user.getId());
         if(statusLikeOfUser==0||statusLikeOfUser==2){
             Like like = new Like();
@@ -187,10 +242,9 @@ public class UserController {
 
     @GetMapping(value = "/dislike-post/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public int dislikeStatus(@PathVariable long id) {
+    public int dislikeStatus(@PathVariable long id,@ModelAttribute("user") User user) {
         Post post = postService.findById(id);
         setLikeForPost(post);
-        User user = getUser();
         long statusLikeOfUser = post.getStatusLikeOfUser(user.getId());
         if(statusLikeOfUser==0||statusLikeOfUser==1){
             Like like = new Like();
@@ -205,5 +259,30 @@ public class UserController {
             likeService.save(like);
             return 0;
         }
+    }
+
+    @PostMapping(value = "/comment-post/{id}")
+    public String comment(@PathVariable long id, @ModelAttribute("comment") String cms, @ModelAttribute("user") User user) {
+        Post post = postService.findById(id);
+        Comment comment = new Comment();
+        comment.setComment(cms);
+        comment.setPost(post);
+        comment.setUser(user);
+        commentService.save(comment);
+        return "redirect:/users/views-post";
+    }
+
+    @GetMapping("/views-images")
+    public String showImages(Model model,@ModelAttribute("user") User user) {
+        Iterable<Image> images = imageService.findAllByUser(user);
+        model.addAttribute("imageList", images);
+        model.addAttribute("image", new Image());
+        return "user/images_list";
+    }
+
+    @PostMapping("/create-image")
+    public String createImg(@ModelAttribute("image") Image image,@ModelAttribute("user") User user) {
+        saveImage(image,user);
+        return "redirect:/users/views-images";
     }
 }

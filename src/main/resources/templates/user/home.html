@@ -3,8 +3,143 @@
 <head th:replace="/layout::head">
 </head>
 <body>
-<a href="/users/create-post">Create Post</a>
-<a href="/users/views-post">View Post</a>
-<a th:href="@{/logout}">Logout</a>
+<section class="container">
+    <div>
+        <img th:src="@{/i/__${user.avatar.name}__}" width="100%" height="300px" class="m-auto">
+    </div>
+    <div>
+        <p class="text-center display-3" th:text="${user.name}">
+        </p>
+    </div>
+    <div th:fragment="header">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="/users/views-post">COME ON</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/users/create-post">Create Post<span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/users/views-images">Images Of You<span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}">Logout</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</section>
+<section class="container">
+    <div class="row">
+        <div class="col-10">
+            <div th:each="p:${posts}">
+                <a th:href="@{/users/views-home-user/__${p.user.id}__}">
+                    <img th:src="@{/i/__${p.user.avatar.name}__}" class="rounded-circle m mr-2" width="50px">
+                    <label th:text="${p.user.name}"></label>
+                </a>
+                <div>
+                    <label>Time published : </label>
+                    <label th:text="${p.datePublished}"></label>
+                    <br>
+                    <label class="display-4" th:text="${p.title}"></label>
+                </div>
+                <div th:if="${p.image.name!=null}">
+                    <img th:src="@{/i/__${p.image.name}__}" width="250px">
+                </div>
+                <br>
+                <p th:text="${p.getIntroduce()}"></p>
+                <a th:href="@{#content__${p.id}__}" aria-expanded="false" data-toggle="collapse">Show</a>
+                <div class="collapse mt-2" th:id="'content'+__${p.id}__">
+                    <p th:text="${p.content}"></p>
+                </div>
+                <div th:switch="${p.getStatusLikeOfUser(__${user.id}__)}">
+                    <div th:case="0">
+                        <label th:text="${p.getNumOfLike()}"></label>
+                        <a th:id="'like'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/like-post/__${p.id}__}">
+                            Like
+                        </a>
+                        <label th:text="${p.getNumOfDisLike()}"></label>
+                        <a th:id="'dislike'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/dislike-post/__${p.id}__}">
+                            Dislike
+                        </a>
+                        <label th:text="${p.comments.size()}"></label>
+                        <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
+                    </div>
+                    <div th:case="1">
+                        <label th:text="${p.getNumOfLike()}"></label>
+                        <a th:id="'like'+__${p.id}__" class="text-primary mr-2" th:href="@{/users/like-post/__${p.id}__}">
+                            Like
+                        </a>
+                        <label th:text="${p.getNumOfDisLike()}"></label>
+                        <a th:id="'dislike'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/dislike-post/__${p.id}__}">
+                            Dislike
+                        </a>
+                        <label th:text="${p.comments.size()}"></label>
+                        <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
+                    </div>
+                    <div th:case="2">
+                        <label th:text="${p.getNumOfLike()}"></label>
+                        <a th:id="'like'+__${p.id}__" class="text-secondary mr-2" th:href="@{/users/like-post/__${p.id}__}">
+                            Like
+                        </a>
+                        <label th:text="${p.getNumOfDisLike()}"></label>
+                        <a th:id="'dislike'+__${p.id}__" class="text-primary mr-2" th:href="@{/users/dislike-post/__${p.id}__}">
+                            Dislike
+                        </a>
+                        <label th:text="${p.comments.size()}"></label>
+                        <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
+                    </div>
+                </div>
+                <div class="collapse mt-2" th:id="'comment'+__${p.id}__">
+                    <div th:each="c:${p.comments}">
+                        <div>
+                            <img th:src="@{/i/__${c.user.avatar.name}__}" width="30px" class="rounded-circle">
+                            <label th:text="${c.user.name}"></label>
+                            <br>
+                            <p class="ml-5" th:text="${c.comment}"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <p>Comment Here</p>
+                        <form method="post" th:action="@{/users/comment-post/__${p.id}__}">
+                            <textarea cols="150" rows="3" th:id="'cms'+__${p.id}__" name="comment"></textarea>
+                            <br>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <a th:href="@{/users/post/__${p.id}__/delete}">
+                        Delete Post
+                    </a>
+                </div>
+                <hr>
+            </div>
+        </div>
+        <div class="col-2">
+            <h4>List Friends</h4>
+            <div th:each="f:${friends}" class="m m-4">
+                <a href="#">
+                    <img th:src="@{/i/__${f.avatar.name}__}" width="50px" class="rounded-circle">
+                    <label th:text="${f.name}"></label>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="container">
+    <div th:replace="/layout::footer"></div>
+</section>
+<script th:src="@{/i/likeAjax.js}"></script>
+<script th:src="@{/i/dislikeAjax.js}"></script>
 </body>
 </html>

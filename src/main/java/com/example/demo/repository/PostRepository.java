@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import com.example.demo.model.Comment;
 import com.example.demo.model.Post;
 import com.example.demo.model.StatusPost;
 import com.example.demo.model.User;

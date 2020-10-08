@@ -5,8 +5,45 @@
 </head>
 <body>
 <section class="container">
-    <h2 class="text-center">List Post Test</h2>
-    <hr>
+    <div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/users/home">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">Disabled</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</section>
+<section class="container">
     <div class="row">
         <div class="col-10">
             <div th:each="p:${posts}">
@@ -20,7 +57,7 @@
                     <br>
                     <label class="display-4" th:text="${p.title}"></label>
                 </div>
-                <div th:if="${p.image.name!=''}">
+                <div th:if="${p.image.name!=null}">
                     <img th:src="@{/i/__${p.image.name}__}" width="250px">
                 </div>
                 <br>
@@ -67,30 +104,24 @@
                         <a th:href="@{#comment__${p.id}__}" aria-expanded="false" data-toggle="collapse"><label>Comments</label></a>
                     </div>
                 </div>
-                    <div class="collapse mt-2" th:id="'comment'+__${p.id}__">
-                        <div th:each="c:${p.comments}">
-                            <div>
-                                <img th:src="@{/i/__${c.user.avatar.name}__}" width="30px" class="rounded-circle">
-                                <label th:text="${c.user.name}"></label>
-                                <br>
-                                <p th:text="${c.comment}"></p>
-                            </div>
-                        </div>
+                <div class="collapse mt-2" th:id="'comment'+__${p.id}__">
+                    <div th:each="c:${p.comments}">
                         <div>
-                            <p>Comment Here</p>
-                            <form>
-                                <textarea cols="100" rows="4" name="comment"></textarea>
-                                <br>
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </form>
+                            <img th:src="@{/i/__${c.user.avatar.name}__}" width="30px" class="rounded-circle">
+                            <label th:text="${c.user.name}"></label>
+                            <br>
+                            <p class="ml-5" th:text="${c.comment}"></p>
                         </div>
                     </div>
-                    <div th:if="${userId}==${p.user.id}">
-                        <a th:href="@{/users/post/__${p.id}__/delete}">
-                            Delete Post
-                        </a>
+                    <div>
+                        <p>Comment Here</p>
+                        <form method="post" th:action="@{/users/comment-post/__${p.id}__}">
+                            <textarea cols="150" rows="3" th:id="'cms'+__${p.id}__" name="comment"></textarea>
+                            <br>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
                     </div>
-                    <hr>
+                </div>
             </div>
         </div>
         <div class="col-2">
@@ -103,6 +134,11 @@
                 </a>
             </div>
         </div>
+    </div>
+</section>
+<section class="container">
+    <div th:replace="/layout::footer">
+
     </div>
 </section>
 <script th:src="@{/i/likeAjax.js}"></script>

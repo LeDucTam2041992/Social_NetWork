@@ -15,6 +15,11 @@ public class StatusUser {
     public StatusUser() {
     }
 
+    public StatusUser(int id, String status) {
+        this.id = id;
+        this.status = status;
+    }
+
     public int getId() {
         return id;
     }

@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.ValueGenerationType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
 @Table(name = "comments")
 public class Comment {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @Column(columnDefinition = "text")

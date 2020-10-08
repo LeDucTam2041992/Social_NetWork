@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.sercurity.CustomLogoutSuccessHandler;
 import com.example.demo.service.comment.CommentService;
 import com.example.demo.service.comment.CommentServiceImpl;
 import com.example.demo.service.image.ImageService;
@@ -15,6 +16,7 @@ import com.example.demo.service.user.UserServiceImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @SpringBootApplication
 public class DemoApplication {

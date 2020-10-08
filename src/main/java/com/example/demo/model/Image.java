@@ -17,6 +17,7 @@ public class Image {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(unique = true)
     private String name;
 
     @Transient
