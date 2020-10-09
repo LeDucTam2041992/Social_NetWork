@@ -32,4 +32,9 @@ public class UserServiceImpl implements UserService {
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
+
+    @Override
+    public Iterable<User> findAllByName(String name) {
+        return userRepository.findAllByNameContaining(name);
+    }
 }

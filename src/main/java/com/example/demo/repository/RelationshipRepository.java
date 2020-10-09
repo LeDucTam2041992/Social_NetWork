@@ -17,4 +17,7 @@ public interface RelationshipRepository extends PagingAndSortingRepository<Relat
 
     @Query("select r from Relationship r where (r.id.user_one_id=:id or r.id.user_two_id=:id) and r.statusRelation.id=3")
     Iterable<Relationship> findAllFollowOfUserByUserId(@Param("id") long id);
+
+    @Query("select r from Relationship r where r.id.user_one_id=:user_one_id and r.id.user_two_id=:user_two_id")
+    Relationship findRelationOfTwoUser(@Param("user_one_id") long id1, @Param("user_two_id") long id2);
 }

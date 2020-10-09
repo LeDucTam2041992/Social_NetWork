@@ -9,4 +9,6 @@ public interface RelationshipService extends IService<Relationship> {
     Iterable<Relationship> findAllBlockOfUser(User user);
     Iterable<Relationship> findAllPendingOfUser(User user);
     Iterable<Relationship> findAllFollowOfUser(User user);
+
+    Relationship findRelationshipOfTwoUser(User user1, User user2);
 }

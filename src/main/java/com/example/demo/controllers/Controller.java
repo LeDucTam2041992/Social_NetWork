@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.model.Image;
+import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.example.demo.service.image.ImageService;
 import com.example.demo.service.user.UserService;
@@ -9,6 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.LinkedList;
+import java.util.List;
 
 @org.springframework.stereotype.Controller
 public class Controller {
@@ -23,10 +27,13 @@ public class Controller {
         return "user/create";
     }
 
-    @PostMapping("/create-account")
+    @PostMapping("/create")
     public String saveNewUser(@ModelAttribute("user") User user) {
-        Image image = imageService.findById(0);
+        Image image = imageService.findById(31);
         user.setAvatar(image);
+        List<Role> roles = new LinkedList<>();
+        roles.add(new Role(1, "ROLE_USER"));
+        user.setRoles(roles);
         userService.save(user);
         return "index";
     }

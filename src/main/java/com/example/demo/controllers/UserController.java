@@ -137,6 +137,20 @@ public class UserController {
             setLikeForPost(p);
         }
         Set<User> friends = getFriendsOnline(user);
+        Iterable<Relationship> relationships = relationshipService.findAllPendingOfUser(user);
+        if(relationships!=null) {
+            List<User> userPending = new LinkedList<>();
+            for (Relationship r : relationships) {
+                if(r.getUser().getId() != user.getId()) {
+                    if (r.getId().getUser_one_id() == user.getId()) {
+                        userPending.add(userService.findById(r.getId().getUser_two_id()));
+                    } else {
+                        userPending.add(userService.findById(r.getId().getUser_one_id()));
+                    }
+                }
+            }
+            model.addAttribute("pending", userPending);
+        }
         model.addAttribute("friends", friends);
         model.addAttribute("posts", postList);
         model.addAttribute("user",user);
@@ -335,4 +349,66 @@ public class UserController {
         model.addAttribute("user", user);
         return "user/guest";
     }
+
+    @PostMapping("/search-user")
+    public String findUser(@ModelAttribute("search") String str, Model model){
+        User user = getUser();
+        List<User> userFind = (List<User>) userService.findAllByName(str);
+        List<User> userBlock = new LinkedList<>();
+        if(!userFind.isEmpty()){
+            for (User u:userFind) {
+                if(user.getId()<u.getId()){
+                    Relationship relationship = relationshipService.findRelationshipOfTwoUser(user,u);
+                    if(relationship!=null){
+                        if(relationship.getStatusRelation().getId()==4) userBlock.add(u);
+                    }
+                } else {
+                    Relationship relationship = relationshipService.findRelationshipOfTwoUser(u,user);
+                    if(relationship!=null){
+                        if(relationship.getStatusRelation().getId()==4) userBlock.add(u);
+                    }
+                }
+            }
+        }
+        userFind.removeAll(userBlock);
+        model.addAttribute("userFind", userFind);
+        return "user/search";
+    }
+
+    @GetMapping("/add-friend/{id}")
+    public String addFriends(@PathVariable("id") long id) {
+        User user = getUser();
+        User userB = userService.findById(id);
+        Relationship relationship = new Relationship();
+        CompositeRelationshipPK compositeRelationshipPK = new CompositeRelationshipPK();
+        if(user.getId()<userB.getId()) {
+            compositeRelationshipPK.setUser_one_id(user.getId());
+            compositeRelationshipPK.setUser_two_id(userB.getId());
+        } else {
+            compositeRelationshipPK.setUser_one_id(userB.getId());
+            compositeRelationshipPK.setUser_two_id(user.getId());
+        }
+        relationship.setId(compositeRelationshipPK);
+        relationship.setStatusRelation(new StatusRelation(0,"Pending"));
+        relationship.setUser(user);
+        relationshipService.save(relationship);
+        return "redirect:/users/home";
+    }
+
+    @GetMapping("/agree-make-friend/{id}")
+    public String agreeFriend(@PathVariable("id") long id){
+        User user = getUser();
+        User userB = userService.findById(id);
+        Relationship relationship = new Relationship();
+        if(user.getId()<userB.getId()) {
+            relationship = relationshipService.findRelationshipOfTwoUser(user, userB);
+        }else {
+            relationship = relationshipService.findRelationshipOfTwoUser(userB, user);
+        }
+        relationship.setStatusRelation(new StatusRelation(1,"Accepted"));
+        relationship.setUser(user);
+        relationshipService.save(relationship);
+        return "redirect:/users/home";
+    }
 }
+

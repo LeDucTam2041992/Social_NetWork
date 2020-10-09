@@ -48,4 +48,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     public Iterable<Relationship> findAllFollowOfUser(User user) {
         return relationshipRepository.findAllFollowOfUserByUserId(user.getId());
     }
+
+    @Override
+    public Relationship findRelationshipOfTwoUser(User user1, User user2) {
+        return relationshipRepository.findRelationOfTwoUser(user1.getId(), user2.getId());
+    }
 }

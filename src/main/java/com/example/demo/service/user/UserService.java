@@ -5,4 +5,5 @@ import com.example.demo.service.IService;
 
 public interface UserService extends IService<User> {
     User findUserByEmail(String email);
+    Iterable<User> findAllByName(String name);
 }

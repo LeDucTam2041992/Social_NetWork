@@ -27,7 +27,7 @@
                     </li>
                     <div th:if="!${relation}">
                         <li class="nav-item active">
-                            <a class="nav-link" href="#">Add Friends<span class="sr-only">(current)</span></a>
+                            <a class="nav-link" th:href="@{/users/add-friend/__${userA.id}__}">Add Friends<span class="sr-only">(current)</span></a>
                         </li>
                     </div>
                 </ul>
