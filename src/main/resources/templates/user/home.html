@@ -5,7 +5,9 @@
 <body>
 <section class="container">
     <div>
-        <img th:src="@{/i/__${user.avatar.name}__}" width="100%" height="300px" class="m-auto">
+        <a th:href="@{/users/avatar-change}">
+            <img th:src="@{/i/__${user.avatar.name}__}" width="100%" height="300px" class="m-auto">
+        </a>
     </div>
     <div>
         <p class="text-center display-3" th:text="${user.name}">

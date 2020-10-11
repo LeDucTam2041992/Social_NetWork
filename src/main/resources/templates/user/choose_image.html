@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/layout::head">
+
+</head>
+<body>
+<section class="container">
+    <div class="row m-auto" style="width: 100%">
+        <div class="col-md-3 col-lg-4 col-xl-5 border" th:each="i:${imageList}">
+            <a th:href="@{/users/avatar-change/__${i.id}__}">
+                <img class="img-fluid py-3" th:src="@{/i/__${i.name}__}" alt="No image">
+            </a>
+        </div>
+    </div>
+</section>
+<footer>
+    <div th:replace="/layout::footer"></div>
+</footer>
+</body>
+</html>

@@ -410,5 +410,23 @@ public class UserController {
         relationshipService.save(relationship);
         return "redirect:/users/home";
     }
+
+    @GetMapping("/avatar-change")
+    public String changeAvatar(Model model){
+        User user = getUser();
+        Iterable<Image> images = imageService.findAllByUser(user);
+        model.addAttribute("user", user);
+        model.addAttribute("imageList", images);
+        return "user/choose_image";
+    }
+
+    @GetMapping("/avatar-change/{id}")
+    public String saveAvatar(@PathVariable("id") long id){
+        User user = getUser();
+        Image image = imageService.findById(id);
+        user.setAvatar(image);
+        userService.save(user);
+        return "redirect:/users/home";
+    }
 }
 
