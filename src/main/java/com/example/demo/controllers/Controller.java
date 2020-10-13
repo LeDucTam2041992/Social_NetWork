@@ -29,7 +29,7 @@ public class Controller {
 
     @PostMapping("/create")
     public String saveNewUser(@ModelAttribute("user") User user) {
-        Image image = imageService.findById(31);
+        Image image = imageService.findById(1);
         user.setAvatar(image);
         List<Role> roles = new LinkedList<>();
         roles.add(new Role(1, "ROLE_USER"));
